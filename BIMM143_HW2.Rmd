@@ -7,6 +7,7 @@ output: html_notebook
 
 # function created in order to create plots for each protein
 ```{r}
+library(bio3d)
 proteinplot <- function(x){
   s <- read.pdb(x)
   s.chainA <- trim.pdb(s, chain = "A", elety = "CA")
