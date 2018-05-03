@@ -1,0 +1,24 @@
+---
+title: "BIMM 143 HW2"
+Author: Metztli Cisneros
+output: html_notebook
+---
+
+
+# function created in order to create plots for each protein
+```{r}
+proteinplot <- function(x){
+  s <- read.pdb(x)
+  s.chainA <- trim.pdb(s, chain = "A", elety = "CA")
+  s.b <-  s.chainA$atom$b
+    plotb3(s.b, sse=s.chainA, typ="l", ylab="Bfactor")
+}
+```
+
+```{r}
+proteinplot("4AKE")
+proteinplot("1AKE")
+proteinplot("1E4Y")
+
+``` 
+

@@ -1,0 +1,197 @@
+---
+title: "BIMM143_lec8"
+name: "Metztli Cisneros"
+date: 4/26/18
+output: html_notebook
+---
+
+
+
+
+```{r}
+# Generate some example data for clustering
+tmp <- c(rnorm(30,-3), rnorm(30,3))
+x <- cbind(x=tmp, y=rev(tmp))
+
+plot(x)
+```
+
+# Use the kmeans() function setting k to 2 and nstart=20
+
+```{r}
+km <- kmeans(x, centers = 2, nstart = 20)
+
+km
+```
+
+```{r}
+km$cluster
+```
+
+# Inspect/print the results
+  # Q. How many points are in each cluster?
+```{r}
+km$size
+```
+    
+  # Q. What ‘component’ of your result object details
+    # - cluster size?
+    # - cluster assignment/membership?
+    # - cluster center?
+```{r}
+km$centers
+```
+
+```{r}
+km$cluster
+```
+
+# Plot x colored by the kmeans cluster assignment and
+# add cluster centers as blue points
+```{r}
+plot(x, col = km$cluster)
+points(km$centers, col = "blue", pch = 15)
+```
+
+  # Q. Repeat for k=3, which one has the better total SS?
+```{r}
+km3 <- kmeans(x, centers = 3, nstart = 20)
+km3
+```
+  
+```{r}
+km$tot.withinss
+```
+  
+  
+```{r}
+class(dist_matrix)
+```
+
+  
+  
+# Hierarchical clustering 
+
+Lets try 
+
+```{r}
+# First we need to calculate point (dis)similarity
+# as the Euclidean distance between observations
+dist_matrix <- dist(x) 
+dist_matrix
+```
+
+```{r}
+# The hclust() function returns a hierarchical
+# clustering model
+hc <- hclust(d = dist_matrix)
+# the print method is not so useful here
+hc 
+```
+  
+Lets draw a tree
+
+```{r}
+plot(hc)
+abline(h=6, col="red")
+cutree(hc, h=6) # Cut by height h
+```
+
+
+
+
+
+
+```{r}
+# Step 1. Generate some example data for clustering
+x <- rbind(
+ matrix(rnorm(100, mean=0, sd = 0.3), ncol = 2), # c1
+ matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2), # c2
+ matrix(c(rnorm(50, mean = 1, sd = 0.3), # c3
+ rnorm(50, mean = 0, sd = 0.3)), ncol = 2))
+
+colnames(x) <- c("x", "y")
+```
+
+```{r}
+# Step 2. Plot the data without clustering
+plot(x)
+```
+
+```{r}
+# Step 3. Generate colors for known clusters
+# (just so we can compare to hclust results)
+col <- as.factor( rep(c("c1","c2","c3"), each=50) )
+plot(x, col=col)
+```
+
+```{r}
+me_matrix <- dist(x)
+
+hc2 <- hclust(me_matrix)
+
+plot(hc2)
+abline(h = 2, col="red")
+cutree(hc, k = 2)
+```
+
+
+
+
+
+# How to do PCA in R
+
+```{r}
+## Initialize a blank 100 row by 10 column matrix
+mydata <- matrix(nrow=100, ncol=10) 
+# call command
+
+## Lets label the rows gene1, gene2 etc. to gene10
+rownames(mydata) <- paste("gene", 1:100, sep="")
+
+## Lets label the first 5 columns wt1, wt2, wt3, wt4 and wt5
+## and the last 5 ko1, ko2 etc. to ko5 (for "knock-out")
+colnames(mydata) <- c( paste("wt", 1:5, sep=""),
+ paste("ko", 1:5, sep="") )
+
+## Fill in some fake read counts
+for(i in 1:nrow(mydata)) {
+ wt.values <- rpois(5, lambda=sample(x=10:1000, size=1))
+ ko.values <- rpois(5, lambda=sample(x=10:1000, size=1))
+
+ mydata[i,] <- c(wt.values, ko.values)
+}
+head(mydata)
+
+#view mydata
+#mydata
+```
+
+```{r}
+## lets do PCA
+pca <- prcomp(t(mydata), scale=TRUE)
+
+## A vector of colors for wt and ko samples
+colvec <- colnames(mydata)
+colvec[grep("wt", colvec)] <- "red"
+colvec[grep("ko", colvec)] <- "blue"
+plot(pca$x[,1], pca$x[,2], col=colvec, pch=16,
+ xlab=paste0("PC1 (", pca.var.per[1], "%)"),
+ ylab=paste0("PC2 (", pca.var.per[2], "%)")) 
+
+```
+
+How well are our PC's capturing our data spread(i.e variance)
+```{r}
+## Precent variance is often more informative to look at
+pca.var <- pca$sdev^2
+pca.var.per <- round(pca.var/sum(pca.var)*100, 1) 
+pca.var.per
+```
+
+PLot scree plot
+```{r}
+barplot(pca.var.per, main="Scree Plot",
+ xlab="Principal Component", ylab="Percent Variation")
+```
+
