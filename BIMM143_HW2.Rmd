@@ -1,7 +1,9 @@
 ---
 title: "BIMM 143 HW2"
+output:
+  html_document:
+    df_print: paged
 Author: Metztli Cisneros
-output: html_notebook
 ---
 
 
