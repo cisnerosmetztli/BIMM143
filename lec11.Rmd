@@ -1,0 +1,105 @@
+---
+title: "BIMM 143 Lec 11"
+author: "Metztli Cisneros"
+date: "May 8, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## PDB Statistics
+
+Download CSV file from PDB database <http://www.rcsb.org/stats/summary>. Read this into R and determine fraction of X-Ray structures
+
+```{r}
+pdb.stats <- read.csv("Data Export Summary.csv")
+```
+
+## Q1: What proportion of PDB entries does X-ray crystallography account for? What proportion of
+structures are protein?
+
+Lets calculate something
+
+```{r}
+percent <- (pdb.stats$Total / sum(pdb.stats$Total)) * 100
+names(percent) <- pdb.stats$Experimental.Method
+percent
+```
+
+## Q2: Type HIV in the search box on the home page and determine how many HIV-1 protease
+structures are in the current PDB? - 793 entries
+
+
+
+
+
+
+
+
+
+
+## Working with bio3d
+
+```{r}
+library(bio3d)
+
+example("plot.bio3d")
+```
+
+
+
+```{r}
+pdb <- read.pdb(file = "1hsg")
+
+print(pdb)
+
+attributes(pdb)
+```
+
+## To access individual attributes use $attribute
+```{r}
+head(pdb$atom)
+```
+
+
+Q8. Use the Bio3D write.pdb() function to write out a new C-alpha atom only PDB file for
+viewing in VMD. 
+```{r}
+inds <- atom.select(pdb, "calpha")
+inds
+```
+
+check if we have what we want
+```{r}
+head(pdb$atom[inds$atom,])
+```
+
+Looks good so lets continueto trim our PDB and write it out
+
+```{r}
+ca.pdb <-  trim.pdb(pdb, inds = inds)
+ca.pdb
+write.pdb(ca.pdb, file = "calpha_only.pdb")
+```
+
+```{r}
+# Download some example PDB files
+ids <- c("1TND_B","1AGR_A","1TAG_A","1GG2_A","1KJY_A","4G5Q_A")
+files <- get.pdb(ids, split = TRUE)
+# Extract and align the chains we are interested in
+pdbs <- pdbaln(files, fit = TRUE, exefile="C:/Users/ninem/Downloads/muscle.exe.exe")
+# Print to screen a summary of the 'pdbs' object
+pdbs
+```
+
+
+```{r}
+aa <- get.seq("lake_A")
+```
+
+```{r}
+b <- blast.pdb(aa)
+```
+
